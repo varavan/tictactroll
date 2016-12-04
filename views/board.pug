@@ -1,0 +1,80 @@
+extends base.pug
+
+block content
+    h1= "Partida con ID " + gameId
+
+    table(class="board")
+        tr
+            td(id="R1C1", data-board-position="1")
+                = '-'
+            td(id="R1C2", data-board-position="2")
+                = '-'
+            td(id="R1C3", data-board-position="3")
+                = '-'
+        tr
+            td(id="R2C1", data-board-position="4")
+                = '-'
+            td(id="R2C2", data-board-position="5")
+                = '-'
+            td(id="R2C3", data-board-position="6")
+                = '-'
+        tr
+            td(id="R3C1", data-board-position="7")
+                = '-'
+            td(id="R3C2", data-board-position="8")
+                = '-'
+            td(id="R3C3", data-board-position="9")
+                = '-'
+
+    button(onclick='javascript:switchPlayer()')
+        = "Switch player"
+
+    div(id='console')
+        = 'CONSOLA DE EVENTOS'
+
+block scripts
+    script.
+        var currentPlayer = 0;
+        var gameId = '#{gameId}';
+
+        socket.emit('connect_to_game', {gameId: gameId});
+
+        socket.on('update_board', function (boardDefinition) {
+            console.log('udpated board', boardDefinition);
+            for (boarddef in boardDefinition) {
+
+                var char = (boardDefinition[boarddef] == 1)
+                    ? 'X'
+                    : (boardDefinition[boarddef] == 10)
+                    ? '0'
+                    : '-';
+
+                $('#' + boarddef).html(char);
+            }
+        });
+
+        socket.on('troll_update', function (troll) {
+            appendConsole('Troll:: ' + troll.message);
+        });
+
+        $('.board tr td').on('click', function (event) {
+
+            var position = $(this).attr('data-board-position');
+            socket.emit('move', {gameId: gameId, position: position, player: currentPlayer});
+
+        });
+
+        function appendConsole(msg) {
+            $('#console').append('<p>' + msg + '</p>');
+        }
+
+        function switchPlayer() {
+            currentPlayer = (currentPlayer == 10) ? 1 : 10;
+
+            appendConsole('Player switched, current ' + currentPlayer);
+
+        }
+
+        switchPlayer()
+
+

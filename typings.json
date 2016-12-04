@@ -1,0 +1,18 @@
+{
+  "globalDependencies": {
+    "aws-sdk": "registry:dt/aws-sdk#0.0.0+20160915131923",
+    "jasmine": "registry:dt/jasmine#2.2.0+20160621224255",
+    "node": "registry:env/node#6.0.0+20160902022231",
+    "promise": "registry:dt/promise#7.1.1+20160602154553",
+    "express": "registry:dt/express",
+    "express-serve-static-core": "registry:dt/express-serve-static-core",
+    "serve-static": "registry:dt/serve-static",
+    "mime": "registry:dt/mime",
+    "socketio": "registry:dt/socket.io",
+    "pug": "registry:dt/pug",
+    "underscore": "registry:dt/underscore"
+  },
+  "dependencies": {
+    "requirejs": "registry:npm/requirejs#2.2.0+20160319062357"
+  }
+}

@@ -1,0 +1,19 @@
+html
+    head
+        title= 'Esto es un titulo'
+        link(href="css/style.css", rel="stylesheet")
+
+    body
+        block content
+
+        script(src='js/socketio.min.js')
+        script(src='js/jquery.min.js')
+            = ''
+        script.
+            var socket = io.connect('http://localhost:8021');
+            socket.on('news', function (data) {
+                console.log(data);
+                socket.emit('my other event', { my: 'data' });
+            });
+
+        block scripts
