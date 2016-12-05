@@ -3,6 +3,11 @@ extends base.pug
 block content
     h1= "Partida con ID " + gameId
 
+    div(class="chat", id="chat")
+        = ""
+    div(class="chatbox")
+        textarea(id="chatbox")
+
     table(class="board")
         tr
             td(id="R1C1", data-board-position="1")
@@ -26,12 +31,6 @@ block content
             td(id="R3C3", data-board-position="9")
                 = '-'
 
-    button(onclick='javascript:switchPlayer()')
-        = "Switch player"
-
-    div(id='console')
-        = 'CONSOLA DE EVENTOS'
-
 block scripts
     script.
         var currentPlayer = 0;
@@ -39,8 +38,11 @@ block scripts
 
         socket.emit('connect_to_game', {gameId: gameId});
 
+        socket.on('game_error', function(payload){
+            appendChat(payload.message, 'system-error');
+        });
+
         socket.on('update_board', function (boardDefinition) {
-            console.log('udpated board', boardDefinition);
             for (boarddef in boardDefinition) {
 
                 var char = (boardDefinition[boarddef] == 1)
@@ -53,8 +55,14 @@ block scripts
             }
         });
 
-        socket.on('troll_update', function (troll) {
-            appendConsole('Troll:: ' + troll.message);
+        socket.on('troll_update', function (payload) {
+            appendChat(payload.message, 'system-troll');
+        });
+
+
+        socket.on('update_chat', function (payload) {
+            var playerType = (payload.player == 1) ? 'playerA' : 'playerB';
+            appendChat(payload.message, playerType);
         });
 
         $('.board tr td').on('click', function (event) {
@@ -64,17 +72,34 @@ block scripts
 
         });
 
-        function appendConsole(msg) {
-            $('#console').append('<p>' + msg + '</p>');
+        $("#chatbox").keypress(function (e) {
+            if (e.which == 13) {
+                var text = $("#chatbox").val();
+                sendChatMessageToServer(text);
+                $("#chatbox").val('');
+            }
+        })
+
+        function sendChatMessageToServer(msg) {
+                socket.emit(
+                    'chat_message',
+                    {
+                        gameId: gameId,
+                        message: msg
+                    }
+                );
+        }
+
+        function appendChat(msg, type) {
+            $('#chat').prepend('<p class="'+type+'">' + msg + '</p>');
         }
 
         function switchPlayer() {
             currentPlayer = (currentPlayer == 10) ? 1 : 10;
-
-            appendConsole('Player switched, current ' + currentPlayer);
-
         }
 
         switchPlayer()
+
+        $(".board").fadeIn();
 
 

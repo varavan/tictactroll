@@ -1,4 +1,6 @@
 import {Game} from "../Model/Game";
+import {GameStatusEnum} from "../Model/GameStatusEnum";
+import {User} from "../../User/Model/User";
 
 export interface GameRepositoryInterface {
 
@@ -9,4 +11,8 @@ export interface GameRepositoryInterface {
     find(gameId): Game;
 
     findAll(): Game[];
+
+    findByStatus(status: GameStatusEnum): Game[];
+
+    findByPlayerAndStatus(user: User, status: GameStatusEnum): Game[];
 }

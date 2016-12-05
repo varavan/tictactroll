@@ -1,4 +1,5 @@
-export class GameNotFoundException {
+import {ExceptionInterface} from "./ExceptionInterface";
+export class GameNotFoundException implements ExceptionInterface {
     private reason: string;
 
     constructor(gameId: any){

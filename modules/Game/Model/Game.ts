@@ -3,6 +3,8 @@ import {User} from "../../User/Model/User";
 import {BoardPositionEnum} from "./BoardPositionEnum";
 import * as _ from 'underscore';
 import {PlayerEnum} from "./PlayerEnum";
+import {GameStatusEnum} from "./GameStatusEnum";
+import {MoveNotAllowedException} from "../Exception/MoveNotAllowedException";
 
 
 export class Game {
@@ -12,6 +14,7 @@ export class Game {
     private board: Board;
     private playerA: User;
     private playerB: User;
+    private status: GameStatusEnum;
     private done: boolean = false;
     private lastPlayerMoved: PlayerEnum;
     private turns: number = 0;
@@ -25,6 +28,7 @@ export class Game {
     }
 
     public finish() {
+        this.status = GameStatusEnum.DONE;
         this.done = true;
     }
 
@@ -40,15 +44,41 @@ export class Game {
         this.playerB = player;
     }
 
+    public getPlayerSpotAvailable(){
+        return (this.playerA == undefined)
+            ? PlayerEnum.PlayerA
+            : (this.playerB == undefined)
+                ? PlayerEnum.PlayerB
+                : PlayerEnum.noPlayer;
+    }
     public isPositionBusy(position: BoardPositionEnum) {
         return this.board.hasPlayer(position) == true;
+    }
+
+    public getStatus(){
+        return this.status;
+    }
+
+    public setStatus(status: GameStatusEnum){
+        this.status = status;
     }
 
     public setMove(player: User, position: BoardPositionEnum) {
 
         if (!this.isPositionBusy(position)) {
-            let playerToMove = this.nextPlayerMove();
-            // let playerToMove = (this.playerA.getId() == this.playerB.getId()) ? this.nextPlayerMove() : this.findPlayerByPlayerId(player);
+            // let playerToMove = this.nextPlayerMove();
+
+            let playerToMove: PlayerEnum;
+
+            if((this.playerA.getId() == this.playerB.getId())){
+                playerToMove = this.nextPlayerMove();
+            }else{
+                playerToMove = this.findPlayerByPlayerId(player.getId());
+
+                if(playerToMove == this.lastPlayerMoved){
+                    throw new MoveNotAllowedException("You moved last time");
+                }
+            }
 
             console.log('player to move ' + playerToMove);
             this.board.set(
@@ -68,6 +98,14 @@ export class Game {
     private nextTurn(){
         this.turns++;
         this.lastPlayerMoved = this.nextPlayerMove();
+    }
+
+    public getPlayer(player: PlayerEnum): User{
+        return (player == PlayerEnum.PlayerA)
+            ? this.getPlayerA()
+            : (player == PlayerEnum.PlayerB)
+                ? this.getPlayerB()
+                : undefined;
     }
 
     public getPlayerA() {
@@ -106,11 +144,11 @@ export class Game {
         return winner;
     }
 
-    private findPlayerByPlayerId(playerId) {
+    public findPlayerByPlayerId(playerId) {
 
-        if (this.playerA.getId() == playerId) {
+        if (this.playerA != undefined && this.playerA.getId() == playerId) {
             return PlayerEnum.PlayerA;
-        } else if (this.playerB.getId() == playerId) {
+        } else if (this.playerB != undefined && this.playerB.getId() == playerId) {
             return PlayerEnum.PlayerB
         } else {
             return PlayerEnum.noPlayer;

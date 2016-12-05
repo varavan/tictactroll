@@ -12,7 +12,8 @@
     "simple-dijs": "^1.8.0",
     "express": "^4.0",
     "pug": "*",
-    "underscore": "~1.8"
+    "underscore": "~1.8",
+    "socket.io": "~1.7"
   },
   "devDependencies": {
     "jasmine": "^2.5.2"

@@ -4,6 +4,7 @@ import {OnMemoryGameRepository} from "./modules/Game/Repository/OnMemoryGameRepo
 import {EmptyUpperDiagonalTroll} from "./modules/Game/Component/EmptyUpperDiagonalTroll";
 import {EmptyDownDiagonalTroll} from "./modules/Game/Component/EmptyDownDiagonalTroll";
 import {SkipLastMovementTroll} from "./modules/Game/Component/SkipLastMovementTroll";
+import {ChatManager} from "./modules/Game/Service/ChatManager";
 
 let io = require('socket.io')(8021);
 
@@ -35,6 +36,7 @@ export function buildContainer(): Container {
 
     di.set('app.game.repository.game', new OnMemoryGameRepository());
 
+    di.set('app.game.service.chat_manager', new ChatManager(di.get('app.socket.service.socket')));
     di.set('app.game.service.game_manager', new GameManager(
         di.get('app.game.repository.game'),
         di.get('app.socket.service.socket')

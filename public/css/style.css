@@ -1,10 +1,71 @@
+body{
+    font-family: 'Roboto', sans-serif;
+}
 table.board tr td{
     padding: 10px;
     background-color: aliceblue;
     text-align: center;
+    cursor: pointer;
 }
 
 
 table.board tr td:hover{
     background-color: gainsboro;
+}
+
+.board {
+    margin: 0 auto;
+    box-shadow: 0 0 10px rgba(0,0,0,.12);
+    width: 660px;
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    display: none;
+}
+
+.chatbox{
+    margin: 0 auto;
+    width: 660px;
+    box-shadow: 0 0 10px rgba(0,0,0,.12);
+    background-color: gray;
+    margin-bottom: 10px;
+    padding: 2px;
+}
+
+.chatbox textarea{
+    width: 100%;
+    padding: 2px;
+    height: 40px;
+}
+
+.chat {
+    margin: 0 auto;
+    box-shadow: 0 0 10px rgba(0,0,0,.12);
+    width: 660px;
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    margin-bottom: 0px;
+    padding: 2px;
+    background-color: azure;
+    height: 200px;
+    overflow: hidden;
+    font-size: 12px;
+}
+
+.chat > .system-error {
+    font-weight: bold;
+    text-align: center;
+}
+
+.chat > .system-troll {
+    font-weight: bold;
+    text-align: center;
+    color: #468036;
+}
+
+.chat > .playerA {
+    text-align: left;
+}
+
+.chat > .playerB {
+    text-align: right;
 }

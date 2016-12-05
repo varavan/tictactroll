@@ -12,6 +12,7 @@ export class SocketService {
     private eventCollection = [];
     private socketServer: any;
     private users: User[];
+    private disconnectCallbacks = [];
 
     constructor(socketServer: any){
         this.socketServer = socketServer;
@@ -36,6 +37,12 @@ export class SocketService {
 
             socket.on(EventsReference.DISCONNECTED, function(payload){
                 console.log('a user has disconnected', payload);
+
+                let user: User = self.findUserBySocket(socket.id);
+
+                _.each(self.disconnectCallbacks, function(callback: any){
+                    callback(user);
+                });
 
                 self.removeUser(socket.id);
 
@@ -63,6 +70,10 @@ export class SocketService {
         this.socketServer.to(user.getSocketId()).emit(event.geEventName(), event.getEventPayload());
     }
 
+    public emitToSocket(event: EventInterface, socketId){
+        this.socketServer.to(socketId).emit(event.geEventName(), event.getEventPayload());
+    }
+
     public findSocketByUser(userId): User{
         return _.find(this.users, function(user: User){
            return (user.getId() == userId);
@@ -73,6 +84,10 @@ export class SocketService {
         return _.find(this.users, function(user: User){
             return (user.getSocketId() == socketId);
         });
+    }
+
+    public addOnDisconnectUserCallback(callback){
+        this.disconnectCallbacks.push(callback);
     }
 
     private removeUser(userId){
