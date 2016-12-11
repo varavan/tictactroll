@@ -3,9 +3,12 @@ body{
 }
 table.board tr td{
     padding: 10px;
-    background-color: aliceblue;
     text-align: center;
     cursor: pointer;
+    padding-top: 10%;
+    padding-bottom: 10%;
+    font-size: 40px;
+    width: 33%;
 }
 
 
@@ -16,56 +19,42 @@ table.board tr td:hover{
 .board {
     margin: 0 auto;
     box-shadow: 0 0 10px rgba(0,0,0,.12);
-    width: 660px;
+    width: 100%;
     -webkit-animation-duration: 1s;
     animation-duration: 1s;
     display: none;
+    background-color: aliceblue;
 }
 
-.chatbox{
-    margin: 0 auto;
-    width: 660px;
-    box-shadow: 0 0 10px rgba(0,0,0,.12);
-    background-color: gray;
-    margin-bottom: 10px;
-    padding: 2px;
+.board-your-turn {
+    background-color: #9bd1a2;
 }
 
-.chatbox textarea{
-    width: 100%;
-    padding: 2px;
-    height: 40px;
+.board-game-not-ready{
+    background-color: #ff4d10;
 }
 
-.chat {
-    margin: 0 auto;
-    box-shadow: 0 0 10px rgba(0,0,0,.12);
-    width: 660px;
-    -webkit-animation-duration: 1s;
-    animation-duration: 1s;
-    margin-bottom: 0px;
-    padding: 2px;
-    background-color: azure;
-    height: 200px;
-    overflow: hidden;
-    font-size: 12px;
+.board-game-trolled{
+    background-color: #fff595;
 }
 
-.chat > .system-error {
-    font-weight: bold;
-    text-align: center;
+.trollface{
+    width: 30px;
+    height: 30px;
 }
 
-.chat > .system-troll {
-    font-weight: bold;
-    text-align: center;
-    color: #468036;
+.row-index-logo{
+    margin-top: 5px;
 }
 
-.chat > .playerA {
-    text-align: left;
+.row-index-buttons {
+    margin-top: 20px;
+}
+.row-index-info{
+    margin-top: 20px;
 }
 
-.chat > .playerB {
-    text-align: right;
+.row-rematch-game{
+    margin-top: 4px;
+    margin-bottom: 4px;
 }

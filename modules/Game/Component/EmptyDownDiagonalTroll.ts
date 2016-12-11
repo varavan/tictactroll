@@ -12,7 +12,7 @@ export class EmptyDownDiagonalTroll implements TrollInterface{
     }
 
     getMessage(): string {
-        return 'Down diagonal trolled :)';
+        return 'Too packed down there';
     }
 
     getType(): TrollTypeEnum {

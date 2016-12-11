@@ -11,7 +11,7 @@ export class EmptyUpperDiagonalTroll implements TrollInterface{
         return board;
     }
     getMessage(): string {
-        return 'Upper diagonal trolled :)';
+        return 'Too packed up there';
     }
     getType(): TrollTypeEnum {
 

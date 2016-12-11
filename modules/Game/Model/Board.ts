@@ -22,6 +22,8 @@ export class Board {
 
     public ALL_POSIBLES_WINNING_MOVES = [this.ROW_1, this.ROW_2, this.ROW_3,this.COL_1, this.COL_2, this.COL_3,this.DIAGONAL_1, this.DIAGONAL_2];
 
+    public ALL_POSITIONS = [BoardPositionEnum.POSITION_R1C1,BoardPositionEnum.POSITION_R1C2,BoardPositionEnum.POSITION_R1C3,BoardPositionEnum.POSITION_R2C1,BoardPositionEnum.POSITION_R2C2,BoardPositionEnum.POSITION_R2C3,BoardPositionEnum.POSITION_R3C1,BoardPositionEnum.POSITION_R3C2,BoardPositionEnum.POSITION_R3C3];
+
     private POSITION_R1C1: PlayerEnum;
     private POSITION_R1C2: PlayerEnum;
     private POSITION_R1C3: PlayerEnum;

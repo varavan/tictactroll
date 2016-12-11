@@ -18,6 +18,9 @@ export class Game {
     private done: boolean = false;
     private lastPlayerMoved: PlayerEnum;
     private turns: number = 0;
+    private totalTurn: number = 0;
+    private winsPlayerA: number = 0;
+    private winsPlayerB: number = 0;
 
     public getBoard(){
         return this.board;
@@ -30,10 +33,39 @@ export class Game {
     public finish() {
         this.status = GameStatusEnum.DONE;
         this.done = true;
+
+        this.totalTurn = this.totalTurn + this.turns;
+
+        if(this.playerDone() == PlayerEnum.PlayerA){
+            this.winsPlayerA++;
+        }else if(this.playerDone() == PlayerEnum.PlayerB){
+            this.winsPlayerB++;
+        }
+
+        this.turns = 0;
     }
 
     public setBoard(board: Board) {
         this.board = board;
+    }
+
+    public cleanBoard(){
+
+        if(!this.done){
+            return;
+        }
+
+        let context = this;
+
+        _.each(this.board.ALL_POSITIONS, function (position) {
+            context.board.set(position, PlayerEnum.noPlayer);
+        });
+
+        context = null;
+
+        this.done = false;
+        this.status = GameStatusEnum.READY_TO_START;
+
     }
 
     public setPlayerA(player: User) {
@@ -63,6 +95,18 @@ export class Game {
         this.status = status;
     }
 
+    public getWinsPlayerA(): number{
+        return this.winsPlayerA;
+    }
+
+    public getWinsPlayerB(): number{
+        return this.winsPlayerB;
+    }
+
+    public getTotalTurns(): number{
+        return this.totalTurn;
+    }
+
     public setMove(player: User, position: BoardPositionEnum) {
 
         if (!this.isPositionBusy(position)) {
@@ -80,7 +124,7 @@ export class Game {
                 }
             }
 
-            console.log('player to move ' + playerToMove);
+
             this.board.set(
                 position,
                 playerToMove
@@ -97,7 +141,11 @@ export class Game {
 
     private nextTurn(){
         this.turns++;
-        this.lastPlayerMoved = this.nextPlayerMove();
+        this.setLastPlayerMoved(this.nextPlayerMove());
+    }
+
+    public setLastPlayerMoved(player: PlayerEnum){
+        this.lastPlayerMoved = player;
     }
 
     public getPlayer(player: PlayerEnum): User{

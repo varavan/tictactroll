@@ -22,7 +22,7 @@ export class SkipLastMovementTroll implements TrollInterface {
     }
 
     getMessage(): string {
-        return 'Your last movmenent, never minds :)';
+        return 'Your last movmenent, never minds';
     }
 
 }

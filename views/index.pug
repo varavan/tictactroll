@@ -1,4 +1,11 @@
 extends base.pug
 
 block content
-    h1= message
+
+    div(class="row row-index-buttons")
+        div(class="col-md-offset-3 col-md-6 text-center")
+            a(href="/new" class="btn btn-default")
+                = "Start a new game"
+    div(class="row row-index-info")
+        div(class="col-md-offset-3 col-md-6 text-center")
+            = "Do you think tic tac toe is a kid's game? Try tic tac troll and get trolled while playing vs a friend by the AI"

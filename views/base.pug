@@ -1,14 +1,29 @@
 html
     head
-        title= 'Esto es un titulo'
+        title= 'Tic tac troll'
+        link(href="/css/normalize.css", rel="stylesheet")
         link(href="/css/style.css", rel="stylesheet")
+        link(href="/css/ns-default.css", rel="stylesheet")
+        link(href="/css/chat.css", rel="stylesheet")
+        link(href="/css/ns-attached.css", rel="stylesheet")
+        link(href="/css/font-awesome.min.css", rel="stylesheet")
+        link(href="/css/bootstrap.min.css", rel="stylesheet")
         //link(href="https://fonts.googleapis.com/css?family=Roboto", rel="stylesheet")
 
     body
-        block content
+        div(class='container')
+            div(class="row row-index-logo")
+                div(class="col-md-offset-4 col-md-5")
+                    a(href="/")
+                        img(src="/images/logo.png" class="img-responsive")
+            block content
 
         script(src='/js/socketio.min.js')
+        script(src='/js/classie.js')
+        script(src='/js/modernizr.custom.js')
+        script(src='/js/notificationFx.js')
         script(src='/js/jquery.min.js')
+        script(src='/js/bootstrap.min.js')
             = ''
         script.
             var socket = io.connect('http://localhost:8021');

@@ -1,48 +1,163 @@
 extends base.pug
 
 block content
-    h1= "Partida con ID " + gameId
+    div(class="row")
+        div(class="col-sm-12 col-md-offset-3 col-md-6 row-no-rematch-game")
+            h3(class="title-page text-center")
+                = "Waiting for players "
+                a(href="#" class="btn btn-default" onclick="javascript:copyGame()")
+                    i(class="fa fa-clipboard")
+        div(class="col-sm-12 col-md-offset-3 col-md-6 text-center row-rematch-game hide")
+            a(href="#" onclick="javascript:rematch()" class="btn btn-default")
+                = "Rematch game!"
 
-    div(class="chat", id="chat")
-        = ""
-    div(class="chatbox")
-        textarea(id="chatbox")
 
-    table(class="board")
-        tr
-            td(id="R1C1", data-board-position="1")
-                = '-'
-            td(id="R1C2", data-board-position="2")
-                = '-'
-            td(id="R1C3", data-board-position="3")
-                = '-'
-        tr
-            td(id="R2C1", data-board-position="4")
-                = '-'
-            td(id="R2C2", data-board-position="5")
-                = '-'
-            td(id="R2C3", data-board-position="6")
-                = '-'
-        tr
-            td(id="R3C1", data-board-position="7")
-                = '-'
-            td(id="R3C2", data-board-position="8")
-                = '-'
-            td(id="R3C3", data-board-position="9")
-                = '-'
 
+
+    div(class="row")
+        div(class="col-md-6 col-md-offset-3 col-sm-12")
+            table(class="board board-game-not-ready")
+                tr
+                    td(id="R1C1", data-board-position="1")
+                        = '-'
+                    td(id="R1C2", data-board-position="2")
+                        = '-'
+                    td(id="R1C3", data-board-position="3")
+                        = '-'
+                tr
+                    td(id="R2C1", data-board-position="4")
+                        = '-'
+                    td(id="R2C2", data-board-position="5")
+                        = '-'
+                    td(id="R2C3", data-board-position="6")
+                        = '-'
+                tr
+                    td(id="R3C1", data-board-position="7")
+                        = '-'
+                    td(id="R3C2", data-board-position="8")
+                        = '-'
+                    td(id="R3C3", data-board-position="9")
+                        = '-'
+    div(class="row")
+        div(class="col-md-2 col-md-offset-3 col-sm-6 text-center")
+            h4= "You"
+        div(class="col-md-2 col-md-offset-2 col-sm-6 text-center")
+            h4= "Your opponent"
+    div(class="row")
+        div(class="col-md-2 col-md-offset-3 col-sm-6 text-center")
+            h3(class="your-punctuation")= "0"
+        div(class="col-md-2 col-md-offset-2 col-sm-6 text-center")
+            h3(class="your-opponent-punctuation")= "0"
+
+    div(class="popup-box chat-popup", id="qnimate")
+        div(class="popup-head")
+            div(class="popup-head-left pull-left")
+                = "Chat"
+            div(class="popup-head-right pull-right")
+                button(id="closeChat" class="chat-header-button" type="button")
+                    i(class="fa fa-times")
+        div(class="direct-chat-messages")
+
+
+        div(class="popup-messages-footer")
+            textarea(id="chatbox")
+
+
+    div(class='navbar navbar-fixed-bottom chat-open')
+        div(class="col-sm-2 col-sm-offset-10")
+            button(id="openChat", class="btn btn-default pull-right")
+                = "Open chat"
 block scripts
     script.
-        var currentPlayer = 0;
+        var currentPlayer = 0; //1 or 10
         var gameId = '#{gameId}';
+        var lastNotification = null;
+        var gameStarted = false;
+        var gamePaused = false;
 
         socket.emit('connect_to_game', {gameId: gameId});
 
-        socket.on('game_error', function(payload){
-            appendChat(payload.message, 'system-error');
+        function cleanNotification() {
+            if (lastNotification != null) {
+                lastNotification.dismiss();
+                console.log('dismissed');
+            }
+
+            lastNotification = null;
+        }
+
+        function startGame() {
+            gameStarted = true;
+            $(".board").removeClass('board-game-not-ready');
+            $(".title-page").html("Game have started!")
+        }
+
+        function pauseGame() {
+            gameStarted = true;
+            console.log('pause game');
+            $(".board").addClass('board-game-not-ready');
+            $(".title-page").html("Game is paused!")
+        }
+
+        function resumeGame() {
+            console.log('pause game');
+            gamePaused = false;
+            startGame();
+        }
+
+        function addNotification(notification) {
+            cleanNotification();
+            // show the notification
+            notification.show();
+
+            lastNotification = notification;
+        }
+
+        socket.on('notify_player_enum', function (payload) {
+            currentPlayer = payload.player;
+        })
+
+        socket.on('next_turn', function (payload) {
+            console.log(payload);
+
+            if (payload.next_player == currentPlayer) {
+                // is my turn
+
+                var notification = createInfoNotification('<span class="fa fa-check-square">  Is Your turn!</div>');
+                addNotification(notification);
+
+                $('.board').addClass('board-your-turn');
+
+            } else {
+                // not my turn anymore
+                $('.board').removeClass('board-your-turn');
+            }
+
+
+        });
+
+        socket.on('game_error', function (payload) {
+
+            var notification = createWarningNotification('<span class="fa fa-exclamation-triangle"> ' + payload.message + '</div>');
+            addNotification(notification);
+        });
+
+        socket.on('resume_game', function (payload) {
+
+            var notification = createWarningNotification('<span class="fa fa-thumbs-up"> Game resumed</div>');
+            addNotification(notification);
+
+            resumeGame();
+
+            $('.row-no-rematch-game').removeClass('hide');
+            $('.row-rematch-game').addClass('hide');
         });
 
         socket.on('update_board', function (boardDefinition) {
+            if (gameStarted == false && gamePaused == false) {
+                startGame();
+            }
+
             for (boarddef in boardDefinition) {
 
                 var char = (boardDefinition[boarddef] == 1)
@@ -56,19 +171,59 @@ block scripts
         });
 
         socket.on('troll_update', function (payload) {
-            appendChat(payload.message, 'system-troll');
+
+            var notification = createInfoNotification('<div style="display: inline"><img src="/images/trollface.jpg" /></div><div style="display: inline">  ' + payload.message + '</div>');
+            addNotification(notification);
+
+            // update board
+            $('.board').addClass('board-game-trolled');
+            setTimeout(function () {
+                $('.board').removeClass('board-game-trolled');
+            }, 1000);
         });
 
 
         socket.on('update_chat', function (payload) {
-            var playerType = (payload.player == 1) ? 'playerA' : 'playerB';
-            appendChat(payload.message, playerType);
+            appendChat(payload.message, payload.player, new Date(payload.time));
+            if (payload.player == currentPlayer) {
+                $("#chatbox").val('');
+            }
+        });
+
+        socket.on('game_is_done', function () {
+            console.log('game is done');
+            pauseGame();
+        });
+
+        socket.on('player_abandoned', function () {
+            console.log('player abandoned');
+            pauseGame();
+
+            var notification = createWarningNotification('<span class="fa fa-ban"> A player has abandoned the game</div>');
+            addNotification(notification);
+        });
+
+        socket.on('winner_player', function (payload) {
+            console.log('winner player');
+            pauseGame();
+
+            var notification = createSuccessNotification('<span class="fa fa-trophy"> A player won the game</div>');
+            addNotification(notification);
+
+            var yourPunctuation = (currentPlayer == 1) ? payload.winsPlayerA : payload.winsPlayerB;
+            var yourOpponentPunctuation = (currentPlayer == 1) ? payload.winsPlayerB : payload.winsPlayerA;
+
+            $('.your-punctuation').html(yourPunctuation);
+            $('.your-opponent-punctuation').html(yourOpponentPunctuation);
+
+            $('.row-no-rematch-game').addClass('hide');
+            $('.row-rematch-game').removeClass('hide');
         });
 
         $('.board tr td').on('click', function (event) {
 
             var position = $(this).attr('data-board-position');
-            socket.emit('move', {gameId: gameId, position: position, player: currentPlayer});
+            socket.emit('move', {gameId: gameId, position: position});
 
         });
 
@@ -76,30 +231,111 @@ block scripts
             if (e.which == 13) {
                 var text = $("#chatbox").val();
                 sendChatMessageToServer(text);
-                $("#chatbox").val('');
             }
         })
 
         function sendChatMessageToServer(msg) {
-                socket.emit(
-                    'chat_message',
-                    {
-                        gameId: gameId,
-                        message: msg
-                    }
-                );
+            socket.emit(
+                'chat_message',
+                {
+                    gameId: gameId,
+                    message: msg
+                }
+            );
         }
 
-        function appendChat(msg, type) {
-            $('#chat').prepend('<p class="'+type+'">' + msg + '</p>');
+        function appendChat(msg, user, time) {
+            var who = (user == currentPlayer) ? 'You' : 'Your opponent';
+
+            var template = '<div class="direct-chat-msg clearfix">' +
+                '<div class="direct-chat-info clearfix">' +
+                who +
+                '</div>' +
+                '<div class="direct-chat-text">' + msg + '</div>' +
+                '<div class="direct-chat-info clearfix">' +
+                '<span class="direct-chat-timestamp pull-right">' + time.getHours() + ':' + time.getMinutes() + '</span>' +
+                '</div>' +
+                '</div>'
+
+            $('.direct-chat-messages').prepend(template);
         }
 
-        function switchPlayer() {
-            currentPlayer = (currentPlayer == 10) ? 1 : 10;
-        }
+        $('#closeChat').on('click', function () {
+            $('#qnimate').removeClass('popup-box-on');
+            $('.chat-open').css('display', 'block');
+        })
 
-        switchPlayer()
+        $('#openChat').on('click', function () {
+            $('#qnimate').addClass('popup-box-on');
+            $('.chat-open').css('display', 'none');
+        })
 
         $(".board").fadeIn();
 
+        function copyGame() {
+            $("body").append("<input type='text' id='temp'>");
+            $("#temp").val("http://tictactroll.com/game/#{gameId}").select();
+            document.execCommand("copy");
+            $("#temp").remove();
 
+            // create the notification
+            var notification = createWarningNotification('<span class="fa fa-exclamation-clipboard"> Game link copied to clipboard</div>');
+            addNotification(notification);
+        }
+
+        function createWarningNotification(msg) {
+
+            // create the notification
+            var notification = new NotificationFx({
+                message: msg,
+                layout: 'attached',
+                effect: 'bouncyflip',
+                type: 'warning',
+                onClose: function () {
+                    console.log('closed');
+                }
+            });
+
+            return notification
+
+        }
+
+        function createSuccessNotification(msg) {
+
+            // create the notification
+            var notification = new NotificationFx({
+                message: msg,
+                layout: 'attached',
+                effect: 'bouncyflip',
+                type: 'warning',
+                onClose: function () {
+                    console.log('closed');
+                }
+            });
+
+            return notification
+
+        }
+
+        function createInfoNotification(msg) {
+
+            // create the notification
+            var notification = new NotificationFx({
+                message: msg,
+                layout: 'attached',
+                effect: 'bouncyflip',
+                type: 'info',
+                onClose: function () {
+                    console.log('closed');
+                }
+            });
+
+            return notification
+
+        }
+
+        function rematch() {
+            socket.emit("rematch", {
+                gameId: gameId
+            })
+        }

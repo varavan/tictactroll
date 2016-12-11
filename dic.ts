@@ -5,6 +5,8 @@ import {EmptyUpperDiagonalTroll} from "./modules/Game/Component/EmptyUpperDiagon
 import {EmptyDownDiagonalTroll} from "./modules/Game/Component/EmptyDownDiagonalTroll";
 import {SkipLastMovementTroll} from "./modules/Game/Component/SkipLastMovementTroll";
 import {ChatManager} from "./modules/Game/Service/ChatManager";
+import {SwitchBoardTroll} from "./modules/Game/Component/SwitchBoardTroll";
+import {SwitchEmptyByPlayedCellsTroll} from "./modules/Game/Component/SwitchEmptyByPlayedCellsTroll";
 
 let io = require('socket.io')(8021);
 
@@ -46,6 +48,8 @@ export function buildContainer(): Container {
     di.get('app.game.service.game_manager').addTroll(new EmptyUpperDiagonalTroll());
     di.get('app.game.service.game_manager').addTroll(new EmptyDownDiagonalTroll());
     di.get('app.game.service.game_manager').addTroll(new SkipLastMovementTroll());
+    di.get('app.game.service.game_manager').addTroll(new SwitchBoardTroll());
+    di.get('app.game.service.game_manager').addTroll(new SwitchEmptyByPlayedCellsTroll());
 
 
     return di;
